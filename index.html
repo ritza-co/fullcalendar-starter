@@ -7,9 +7,11 @@
 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/index.global.min.js"></script>
     <script>
+      let calendar;
+
       document.addEventListener('DOMContentLoaded', function () {
         const calendarEl = document.getElementById('calendar');
-        const calendar = new FullCalendar.Calendar(calendarEl, {
+        calendar = new FullCalendar.Calendar(calendarEl, {
           initialView: 'dayGridMonth',
           headerToolbar: {
             start: 'prev,next today',
@@ -31,7 +33,8 @@
             },
           },
           selectable: true,
-          select: function (info) {
+          eventClick: function (info) {
+            console.log('Select');
             selectedEventId = info.event ? info.event.id : null;
           },
           editable: true,
@@ -91,6 +94,32 @@
           });
       }
 
+      function createEvent(eventData) {
+        fetch('http://localhost:3000/events', {
+          method: 'POST',
+          body: JSON.stringify(eventData),
+          headers: { 'Content-Type': 'application/json' },
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('Error creating event');
+            }
+            return response.json();
+          })
+          .then((data) => {
+            const newEvent = {
+              id: data.id,
+              title: eventData.title,
+              start: eventData.start,
+              end: eventData.end,
+            };
+            calendar.render();
+          })
+          .catch((error) => {
+            console.error('Error while creating event:', error);
+          });
+      }
+
       function deleteEvent(eventId) {
         fetch(`http://localhost:3000/events/${eventId}`, {
           method: 'DELETE',
@@ -134,7 +163,9 @@
           if (confirm('Are you sure you want to delete the selected event?')) {
             deleteEvent(selectedEventId);
             const event = calendar.getEventById(selectedEventId);
-            event.remove();
+            if (event) {
+              event.remove();
+            }
             selectedEventId = null;
           }
         } else {
