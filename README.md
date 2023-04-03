@@ -91,7 +91,7 @@ Run the server with:
 node server.js
 ```
 
-then find your FullCalendar app at [`http://localhost:3000/`](http://localhost:3000/)
+Then open up your `index.html` in the browser to see your FullCalendar app.
 
 ## Resources
 
