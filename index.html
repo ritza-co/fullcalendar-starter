@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FullCalendar with Node.js and MySQL</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/index.global.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const calendarEl = document.getElementById('calendar');
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          headerToolbar: {
+            start: 'prev,next today',
+            center: 'title',
+            end: 'addEventButton,deleteSelectedEventButton',
+          },
+          customButtons: {
+            addEventButton: {
+              text: 'Add Event',
+              click: function () {
+                showAddEventForm();
+              },
+            },
+            deleteSelectedEventButton: {
+              text: 'Delete Selected Event',
+              click: function () {
+                deleteSelectedEvent();
+              },
+            },
+          },
+          selectable: true,
+          select: function (info) {
+            selectedEventId = info.event ? info.event.id : null;
+          },
+          editable: true,
+          events: 'http://localhost:3000/events',
+          eventReceive: function (info) {
+            const eventData = {
+              title: info.event.title,
+              start: info.event.startStr,
+              end: info.event.endStr,
+            };
+            fetch('http://localhost:3000/events', {
+              method: 'POST',
+              body: JSON.stringify(eventData),
+              headers: { 'Content-Type': 'application/json' },
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                info.event.setProp('id', data.id);
+              })
+              .catch((error) => {
+                console.error('Error while posting event:', error);
+              });
+          },
+          eventDrop: function (info) {
+            const eventData = {
+              id: info.event.id,
+              start: info.event.startStr,
+              end: info.event.endStr,
+            };
+            updateEvent(eventData);
+          },
+          eventResize: function (info) {
+            const eventData = {
+              id: info.event.id,
+              start: info.event.startStr,
+              end: info.event.endStr,
+            };
+            updateEvent(eventData);
+          },
+        });
+        calendar.render();
+      });
+
+      function updateEvent(eventData) {
+        fetch(`http://localhost:3000/events/${eventData.id}`, {
+          method: 'PUT',
+          body: JSON.stringify(eventData),
+          headers: { 'Content-Type': 'application/json' },
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('Error updating event');
+            }
+          })
+          .catch((error) => {
+            console.error('Error while updating event:', error);
+          });
+      }
+
+      function deleteEvent(eventId) {
+        fetch(`http://localhost:3000/events/${eventId}`, {
+          method: 'DELETE',
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('Error deleting event');
+            }
+          })
+          .catch((error) => {
+            console.error('Error while deleting event:', error);
+          });
+      }
+      let selectedEventId = null;
+
+      function showAddEventForm() {
+        const title = prompt('Enter the event title:');
+        if (title) {
+          const start = prompt(
+            'Enter the start date and time in YYYY-MM-DDTHH:mm format:'
+          );
+          if (start) {
+            const end = prompt(
+              'Enter the end date and time in YYYY-MM-DDTHH:mm format:'
+            );
+            if (end) {
+              createEvent({ title, start, end });
+            } else {
+              alert('Invalid end date and time.');
+            }
+          } else {
+            alert('Invalid start date and time.');
+          }
+        } else {
+          alert('Invalid title.');
+        }
+      }
+
+      function deleteSelectedEvent() {
+        if (selectedEventId) {
+          if (confirm('Are you sure you want to delete the selected event?')) {
+            deleteEvent(selectedEventId);
+            const event = calendar.getEventById(selectedEventId);
+            event.remove();
+            selectedEventId = null;
+          }
+        } else {
+          alert('No event selected. Please select an event to delete.');
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="calendar"></div>
+  </body>
+</html>
