@@ -60,15 +60,15 @@ Let’s create the table that we’ll need for our FullCalendar data:
 CREATE TABLE `events` (
   `id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
-  `start_date` datetime NOT NULL,
-  `end_date` datetime NOT NULL,
+  `start` datetime NOT NULL,
+  `end` datetime NOT NULL,
   PRIMARY KEY (`id`))
 ```
 
 Now add some example event data to the `events` table:
 
 ```sql
-INSERT INTO events (id, title, start_date, end_date)
+INSERT INTO events (id, title, start, end)
 VALUES
   (1, 'Meeting with John', '2023-04-01 09:00:00', '2023-04-01 10:00:00'),
   (2, 'Project Kickoff', '2023-04-02 14:00:00', '2023-04-02 16:00:00'),
