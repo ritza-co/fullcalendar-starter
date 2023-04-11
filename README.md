@@ -1,12 +1,12 @@
 # FullCalendar with CRUD
 
-This project is a JS FullCalendar application with a server for perfroming CRUD operations.
+This project is a JS FullCalendar application with a server for performing CRUD operations.
 
 ## Getting Started
 
 To get started you need to clone the repository and navigate into the folder.
 
-```
+```sh
 git clone https://github.com/ritza-co/fullcalendar-starter fullcalendar
 cd fullcalendar
 ```
@@ -17,7 +17,7 @@ We already configured the required packages in the `package.json` file.
 
 You can run the following command to install all dependent packages related to this project.
 
-```
+```sh
 npm install
 ```
 
@@ -27,7 +27,7 @@ In the `server.js` file, the Express server uses the MySQL2 library to connect t
 
 Create a `.env` file in the root folder and add the following lines for connecting to the MySQL database that we’ll create:
 
-```bash
+```
 DB_HOST='localhost'
 DB_USER='root'
 DB_PASSWORD='<your-password>'
@@ -87,11 +87,11 @@ SELECT * FROM events;
 
 Run the server with:
 
-```
+```sh
 node server.js
 ```
 
-Then open up your `index.html` in the browser to see your FullCalendar app.
+Then navigate to `http://localhost:3000/` or open up your `public/index.html` in the browser to see your FullCalendar app.
 
 ## Resources
 
